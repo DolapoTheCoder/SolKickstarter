@@ -21,6 +21,19 @@ beforeEach(async () => {
         .send({ 
             from: accounts[0],
             gas: '1000000'
-         })
+         });
+    
+    await factory.methods.createCampaign('100')
+        .send({
+            from: accounts[0],
+            gas: '1000000'
+        }); //no result comes back from where campaign is
+
+    [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
+    campaign = await new web3.eth.Contract(
+        JSON.parse(compiledCampaign.interface),
+        campaignAddress[0]
+        ); //informing web3 of the existence
+        //and whereabouts of campaign
 });
 
