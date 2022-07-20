@@ -37,3 +37,9 @@ beforeEach(async () => {
         //and whereabouts of campaign
 });
 
+describe('Campaign', () => {
+    it('deploys a factory and campaign', () => {
+        assert.ok(factory.options.address);
+        assert.ok(campaign.options.address);
+    });
+});
