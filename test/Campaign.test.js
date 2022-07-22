@@ -15,16 +15,10 @@ beforeEach(async () => {
     accounts = await web3.eth.getAccounts();
     
     factory = await new web3.eth.Contract(JSON.parse(compiledFactory.interface))
-        .deploy({ 
-            data: compiledFactory.bytecode
-         })
-        .send({ 
-            from: accounts[0],
-            gas: '1000000'
-         });
+        .deploy({ data: compiledFactory.bytecode })
+        .send({ from: accounts[0], gas: '1000000' });
     
-    await factory.methods.createCampaign('100')
-        .send({
+    await factory.methods.createCampaign('100').send({
             from: accounts[0],
             gas: '1000000'
         }); //no result comes back from where campaign is
@@ -32,7 +26,7 @@ beforeEach(async () => {
     [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
     campaign = await new web3.eth.Contract(
         JSON.parse(compiledCampaign.interface),
-        campaignAddress[0]
+        campaignAddress
         ); //informing web3 of the existence
         //and whereabouts of campaign
 });
@@ -41,5 +35,47 @@ describe('Campaign', () => {
     it('deploys a factory and campaign', () => {
         assert.ok(factory.options.address);
         assert.ok(campaign.options.address);
+    });
+    
+    it('marks caller as the campaign manager', async () => {
+        const manager = await campaign.methods.manager().call();
+        assert.equal(accounts[0], manager);
+    });
+
+    it('allows contribution and makes approvers', async () => {
+        await campaign.methods.contribute().send({ 
+            value: '200',
+            from: accounts[1] //2nd ganache acct
+         });
+        //HOW TO CHECK MAPPINGS
+        const check = await campaign.methods.approvers(accounts[1]).call();
+
+        assert.equal(check, true);
+    });
+
+    it('req min contribution', async () => {
+        try {
+            await campaign.methods.contribute.send({
+                value: '90', //100 is min contribution
+                from: accounts[2]
+            });
+            assert(false);
+        } catch (error) {
+            assert(error);
+        };
+    });
+
+    it('make request', async () => {
+        
+        await campaign.methods
+            .createRequest('Buy solar panels', '100', accounts[1])
+            .send({
+                from: accounts[0],
+                gas: '1000000'
+            });
+
+        const request = await campaign.methods.request(0).call();
+
+        assert.equal('Buy solar panels', request.description);
     });
 });
