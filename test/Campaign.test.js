@@ -65,17 +65,49 @@ describe('Campaign', () => {
         };
     });
 
-    it('make request', async () => {
-        
+    // it('make request', async () => {
+    //     await campaign.methods
+    //         .createRequest('Buy food', '200', accounts[1])
+    //         .send({
+    //             from: accounts[0],
+    //             gas: '1000000'
+    //         });
+
+    //     const request = await campaign.methods.request(0).call();
+
+    //     assert.equal('Buy food', request.description);
+    // });
+
+    it('processes a request', async () => {
+        await campaign.methods.contribute().send({
+            from: accounts[0],
+            value: web3.utils.toWei('10', 'ether')
+        });
+
         await campaign.methods
-            .createRequest('Buy solar panels', '100', accounts[1])
+            .createRequest('A', web.utils.toWei('5', ether), accounts[1])
             .send({
                 from: accounts[0],
                 gas: '1000000'
             });
 
-        const request = await campaign.methods.request(0).call();
+        await campaign.methods.approveRequest(0).send({
+            from: accounts[0],
+            gas: '1000000'
+        });
 
-        assert.equal('Buy solar panels', request.description);
+       // const ogBalance = await web3.eth.getBalance(accounts[1]);
+
+        await campaign.methods.finalizeRequest(0).send({
+            from: accounts[0],
+            gas: '1000000'
+        });
+
+        let balance = await web3.eth.getBalance(accounts[1]);
+        balance = web3.utils.fromWei(balance, 'ether');
+        //string to float
+        balance = parseFloat(balance);
+        console.log(balance);
+        assert(balance > 104); 
     });
 });
