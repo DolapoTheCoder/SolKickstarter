@@ -1,7 +1,8 @@
 // create and export react component
 import React, { Component } from 'react';
 import factory from '../ethereum/factory';
-import { Card } from 'semantic-ui-react';
+import { Card, Button } from 'semantic-ui-react';
+import Layout from '../components/Layout';
 
 //class based component
 
@@ -23,16 +24,25 @@ class CampaignIndex extends Component {
         });
 
         return <Card.Group items={items} />;
-    }
+    };
 
     //react needs some jsx or will throw error.
     render () {
         //call props from getInitialProps
-       return 
+       return (
+        <Layout>
        <div>
-        <link></link>
-        {this.renderCampaigns()}
+            <link
+                async
+                rel="stylesheet"
+                href="https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"
+            />
+            <h3>Open Campaigns</h3>
+            <Button content="Create campaign" icon="add circle" />
+            {this.renderCampaigns()}
        </div>
+       </Layout>
+       )
     };
 };
 
