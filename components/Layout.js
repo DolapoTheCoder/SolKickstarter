@@ -3,14 +3,15 @@
 //called at each page
 
 import React from 'react';
+import { Container } from 'semantic-ui-react';
+import Header from './Header';
 
 const Layout = (props) => {
     return (
-        <div>
-            <h1>header</h1>
+        <Container>
+            <Header/>
             {props.children}
-            <h1>footer</h1>
-        </div>
+        </Container>
     );
 };
 
